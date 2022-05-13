@@ -1,0 +1,142 @@
+#### instanceof 是java的保留关键字。
+###### 作用
+>他的作用就是测试左边的对象是不是右边类的实例，是的话就返回true，不是的话返回false。
+也就是说，比如一个表达式
+
+```
+boolean b = object instanceof class
+```
+左边是对象，右边是类，结果是boolean。
+
+这里要注意：
+类的实例包括本身的实例，以及所有直接或间接子类的实例
+instanceof左边显式声明的类型与右边操作元必须是同种类或存在继承关系，也就是说需要位于同一个继承树，否则会编译错误
+##### 用法：
+左边的对象实例不能是基础数据类型（也就是八种基本数据类型，String 可以）：
+![](https://img-blog.csdnimg.cn/20201215091548607.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTg2NTc2MA==,size_16,color_FFFFFF,t_70)
+```
+package instance;
+public class instanceofTest {
+    public static void main(String[] args){
+        double d = 0.0001;
+        if (d instanceof Double) {
+            System. out. println("true");
+        }
+        String name = "我爱中国!";
+        if (name instanceof String) {
+            System. out. println("对");
+        }
+    }
+}
+```
+>编译时第五行会报错:
+java: 意外的类型
+  需要: 引用
+  找到:double
+
+左边的对象和右边的类不在同一个继承树上。
+![](https://img-blog.csdnimg.cn/20201215091628875.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTg2NTc2MA==,size_16,color_FFFFFF,t_70)
+```
+package instance;
+public class instanceofTest {
+    public static void main(String[] args){
+        double d = 0.0001;
+        if (d instanceof Double) {
+            System. out. println("true");
+        }
+        String name = "我爱中国!";
+        if (name instanceof Double) {
+            System. out. println("对");
+        }
+    }
+}
+```
+>第九行报错：Inconvertible types; cannot cast java.lang.String to java.lang.Double'
+
+null用instanceof跟任何类型比较，是返回false，而不是编译错误。
+![](https://img-blog.csdnimg.cn/20201215091642841.png)
+```
+if (name instanceof String) {
+    System. out. println("true");
+}
+```
+>第一行会提示：Condition 'null instanceof String' is always 'false' more...
+
+代码示例：
+```
+public class A{
+
+}
+
+public class B implements A{
+
+}
+
+public class C extends B{
+}
+
+```
+测试：
+```
+public class Test {
+	public static void main(String[] args) {
+		A a = null;
+		B b = null;
+		boolean result;
+		result = a instanceof A;
+		System.out.println(result); // 结果：false null用instanceof跟任何类型比较时都是false
+		result = b instanceof B;
+		System.out.println(result); // 结果：false null用instanceof跟任何类型比较时都是false
+
+
+		a = new B();
+		b = new B();
+		result = a instanceof A;
+		System.out.println(result); // 结果：true a是接口A的实例对象引用指向子类类B，类B实现了接口A，所以属于同一个继承树分支
+		result = a instanceof B;
+		System.out.println(result); // 结果：true a是接口A的实例对象引用指向子类类B，类B实现了接口A，所以属于同一个继承树分支
+		result = b instanceof A;
+		System.out.println(result);// 结果：true b是类B的实例对象，类B实现了接口A，所以属于同一个继承树分支
+		result = b instanceof B;
+		System.out.println(result);// 结果：true b是类B的实例对象，类B实现了接口A，所以属于同一个继承树分支
+
+
+		B b2 = new C();
+		result = b2 instanceof A;
+		System.out.println(result); // 结果：true b2是父类B引用指向子类C，类B实现了接口A，所以属于同一个继承树分支
+		result = b2 instanceof B;
+		System.out.println(result); // 结果：true b2是父类B引用指向子类C，所以属于同一个继承树分支
+		result = b2 instanceof C;
+		System.out.println(result); // 结果：true b2是父类B引用指向子类C，所以属于同一个继承树分支
+	}
+}
+```
+instanceif 一般用于对象类型强制转换：
+```
+public class C extends B {
+
+    private void print(Object a) {
+        System.out.println(a+" instanceof");
+    }
+
+    public void convert(String b) {
+
+        if (b instanceof Object) {
+            this.print(b);
+        }
+    }
+
+}
+
+```
+```
+public class InstanceofTest4 {
+
+    public static void main(String[] args) {
+        C c = new C();
+        c.convert("aa");
+    }
+}
+
+```
+>结果：aa instanceof

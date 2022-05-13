@@ -1,0 +1,33 @@
+#### 使用durid
+##### SQL解析
+1.先格式化sql
+```
+String sql = "select gender,email,phone,address from table1  where id = 3
+              and name = 'dave' limit 1,500 ;";
+String sqlResult = SQLUtils.format(sql, dbType);
+```
+2.再解析为 SQLStatement 对象
+```
+List<SQLStatement> sqls = SQLUtils.parseStatements(sql, "mysql");
+```
+此时 SQLStatement已经根据不同的sql语句调用了不同的实现  里面包含的内容不太一样（learn：多态）
+```
+sqls.forEach(s->{
+    SqlInfoDO bo = new SqlInfoDO();
+    bo.setSql(s.toString());
+    if (s instanceof SQLUpdateStatement || s instanceof SQLDeleteStatement || s instanceof SQLInsertInto || s instanceof SQLReplaceStatement) {
+        bo.setSqlTypeEnum(SqlTypeEnum.DML);
+    } else if (s instanceof SQLDDLStatement || s instanceof SQLAlterStatement) {
+        bo.setSqlTypeEnum(SqlTypeEnum.DDL);
+    } else if (s instanceof SQLSelectStatement || s instanceof MySqlShowStatement) {
+        bo.setSqlTypeEnum(SqlTypeEnum.DQL);
+    }else {
+        bo.setSqlTypeEnum(SqlTypeEnum.EXEC);
+    }
+    list.add(bo);
+});
+```
+详情见：
+csdn：https://blog.csdn.net/First_____/article/details/116326271
+官方文档：https://github.com/alibaba/druid/wiki/Druid_SQL_AST
+知乎（原理）：https://zhuanlan.zhihu.com/p/411029742
